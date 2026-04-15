@@ -1,27 +1,25 @@
 class Solution:
-    def solveSudoku(self, board: List[List[str]]) -> None:
-        """
-        Do not return anything, modify board in-place instead.
-        """
+    def solveSudoku(self, board):
+
+        rows = [set() for _ in range(9)]
+        cols = [set() for _ in range(9)]
+        boxes = [set() for _ in range(9)]
+
+        for r in range(9):
+            for c in range(9):
+                if board[r][c] != ".":
+                    val = board[r][c]
+                    rows[r].add(val)
+                    cols[c].add(val)
+                    boxes[(r // 3) * 3 + (c // 3)].add(val)
 
         def isSafe(row, col, digit):
-            for ind in range(0, 9):
-                if board[row][ind] == digit:
-                    return False
-
-            for ind in range(0, 9):
-                if board[ind][col] == digit:
-                    return False
-
-            StartRow = (row // 3) * 3
-            StartCol = (col // 3) * 3
-
-            for r in range(StartRow, StartRow + 3):
-                for c in range(StartCol, StartCol + 3):
-                    if board[r][c] == digit:
-                        return False
-
-            return True
+            box_id = (row // 3) * 3 + (col // 3)
+            return (
+                digit not in rows[row]
+                and digit not in cols[col]
+                and digit not in boxes[box_id]
+            )
 
         def halperFunction(row, col):
             if row == 9:
@@ -39,10 +37,20 @@ class Solution:
 
             for digit in "123456789":
                 if isSafe(row, col, digit):
+
+                    box_id = (row // 3) * 3 + (col // 3)
+
                     board[row][col] = digit
+                    rows[row].add(digit)
+                    cols[col].add(digit)
+                    boxes[box_id].add(digit)
+
                     if halperFunction(nextRow, nextCol):
                         return True
                     board[row][col] = "."
+                    rows[row].remove(digit)
+                    cols[col].remove(digit)
+                    boxes[box_id].remove(digit)
 
             return False
 
